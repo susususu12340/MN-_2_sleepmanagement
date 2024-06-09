@@ -1,0 +1,16 @@
+バージョン
+Python 3.12.2
+
+環境作成
+python3 -m venv .venv
+
+起動時
+source .venv/bin/activate
+pip install -r requirements.txt
+pip freeze > requirements.txt
+
+サーバー起動
+uvicorn main:app --reload
+
+閉じる
+deactivate
