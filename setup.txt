@@ -21,14 +21,21 @@ deactivate
 cd sleep-tracker
 npm start
 
+・react.jsの環境構築
+brew update
+brew install nodejs
+node -v　# Node.jsが入っているか確認
+npm -v　# npmが入っているか確認
+
+cd sleep-tracker
+npm install axios jwt-decode chart.js react-chartjs-2
+
 
 
 <githubの扱い>
 mainから派生したdevelopブランチにfeature-機能名というブランチを派生させる。
 featureブランチで機能を開発し完了したらdevelopに統合する。最終的な完成形をmainに統合する
 改修はfix-機能名、バグ修正の時はbugfix-機能名でdevelopからブランチを派生する
-
-複数人で同じファイルを編集しないようにする。(統合のときに競合が起きてややこしくなる)
 ファイルを編集してgithubを更新したらチャットとかLINEとかで連絡する
 
 <chatgptのやりとり>
