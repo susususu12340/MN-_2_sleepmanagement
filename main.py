@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 from typing import Optional
 
+
 app = FastAPI()
 
 origins = [
