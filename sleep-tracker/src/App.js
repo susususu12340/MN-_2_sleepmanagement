@@ -30,7 +30,7 @@ function App() {
       });
       const { access_token } = response.data;
       setToken(access_token);
-      const decoded = jwt_decode(access_token);
+      const decoded = jwtDecode(access_token);
       setCurrentUser(decoded.sub);
     } catch (error) {
       console.error('Login error', error);

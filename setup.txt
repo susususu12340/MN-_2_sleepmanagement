@@ -14,10 +14,3 @@ uvicorn main:app --reload
 
 閉じる
 deactivate
-
-ERROR
-[eslint] 
-src/App.js
-  Line 33:23:  'jwt_decode' is not defined  no-undef
-
-Search for the keywords to learn more about each error.
