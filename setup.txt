@@ -1,16 +1,45 @@
-バージョン
-Python 3.12.2
+・pythonバージョン
 
-環境作成
+
+・環境作成
 python3 -m venv .venv
 
-起動時
+・起動時
 source .venv/bin/activate
 pip install -r requirements.txt
-pip freeze > requirements.txt
 
-サーバー起動
+・サーバー起動
 uvicorn main:app --reload
 
-閉じる
+・pythonモジュールを追加した後
+pip freeze > requirements.txt 
+
+・閉じる
 deactivate
+
+・react.jsの起動
+cd sleep-tracker
+npm start
+
+
+
+<githubの扱い>
+mainから派生したdevelopブランチにfeature-機能名というブランチを派生させる。
+featureブランチで機能を開発し完了したらdevelopに統合する。最終的な完成形をmainに統合する
+改修はfix-機能名、バグ修正の時はbugfix-機能名でdevelopからブランチを派生する
+
+複数人で同じファイルを編集しないようにする。(統合のときに競合が起きてややこしくなる)
+ファイルを編集してgithubを更新したらチャットとかLINEとかで連絡する
+
+<chatgptのやりとり>
+https://chatgpt.com/share/e9675e25-f9b4-43a3-a166-db89c1ed11a6
+
+<参考リンク>
+・Chart.jsでグラフを描画してみた - Qiita
+https://qiita.com/Haruka-Ogawa/items/59facd24f2a8bdb6d369
+・出来る限り短く説明するReactJS入門 - Qiita
+https://qiita.com/rgbkids/items/8ec309d1bf5e203d2b19
+・GitHubデスクトップ（GitHub Desctop）の使い方【初心者向け】
+https://shopify-restaurant.com/github-desctop-how-to/
+・Windows、macOS、LinuxにReactをインストールする方法
+https://kinsta.com/jp/knowledgebase/install-react/#windowsreact
