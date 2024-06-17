@@ -125,7 +125,6 @@ async def register(user: UserCreate):
         print(f"Error registering user: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-
 # トークン発行エンドポイント
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
