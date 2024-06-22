@@ -14,16 +14,6 @@ app.add_middleware(
     allow_methods=['*'],
 )
 
-
-@app.get("/", response_class=HTMLResponse)
-async def get_client():
-    """Return client HTML"""
-    data = ''
-    with open('client.html', 'rt', encoding='utf-8') as f:
-        data = f.read()
-    return data
-
-
 # app.include_router(group.router)
 app.include_router(sleepdata.router)
 # app.include_router(user.router)

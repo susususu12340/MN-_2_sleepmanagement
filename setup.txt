@@ -6,10 +6,14 @@ python3 -m venv .venv
 
 ・起動時
 source .venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 
 ・サーバー起動
 uvicorn main:app --reload
+
+・pythonモジュールの追加
+pip install ~
 
 ・pythonモジュールを追加した後
 pip freeze > requirements.txt 
