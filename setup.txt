@@ -29,6 +29,7 @@ npm -v　# npmが入っているか確認
 
 cd sleep-tracker
 npm install axios jwt-decode chart.js react-chartjs-2
+npm install  moment chartjs-adapter-moment --save
 
 
 
