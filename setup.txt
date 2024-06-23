@@ -10,7 +10,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 ・サーバー起動
-uvicorn main:app --reload
+uvicorn api.main:app --reload
 
 ・pythonモジュールの追加
 pip install ~
@@ -33,7 +33,7 @@ npm -v　# npmが入っているか確認
 
 cd sleep-tracker
 npm install axios jwt-decode chart.js react-chartjs-2
-npm install  moment chartjs-adapter-moment --save
+npm install moment chartjs-adapter-moment --save
 
 
 

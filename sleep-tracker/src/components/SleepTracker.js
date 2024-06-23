@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import {
   Chart as ChartJS,
   LinearScale,
@@ -42,7 +42,7 @@ const initialData = {
       backgroundColor: "rgb(255, 99, 132)",
       borderColor: "white",
       borderWidth: 2,
-      data: [9, 10, 8, 9, 0, 0, 0],
+      data: [0, 0, 0, 0, 0, 0, 0],
       yAxisID: "y" // Y軸の設定
     },
     // {
@@ -95,15 +95,18 @@ export const options = {
   }
 };
 
-export default function App() {
+export default function SleepTracker() {
   const [bedtime, setBedtime] = useState("");
   const [wakeup, setWakeup] = useState("");
-  const [sleepData, setSleepData] = useState([]);
+  //const [sleepData, setSleepData] = useState([]);
 
   const chartRef = useRef(null); // chartの参照を取得するため必要
 
   useEffect(() => {
-    const ctx = document.getElementById("chart").getContext("2d");
+    const ctx = null
+    document.addEventListener("DOMContentLoaded", (event) => {
+      ctx = document.getElementById("chart").getContext("2d");
+    });
     chartRef.current = new ChartJS(ctx, {
       type: 'bar',
       data: initialData,
@@ -114,14 +117,14 @@ export default function App() {
     };
   }, []);
 
-  const fetchSleepData = async () => {
-    const response = await axios.get("http://localhost:8000/sleep-data/");
-    setSleepData(response.data);
-  };
+  // const fetchSleepData = async () => {
+  //   const response = await axios.get("http://localhost:8000/sleep-data/");
+  //   setSleepData(response.data);
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const today = new Date().toISOString().split("T")[0];
+    // const today = new Date().toISOString().split("T")[0];
     const previous_day = new Date();
     previous_day.setDate(previous_day.getDate() - 1);
 
@@ -142,7 +145,7 @@ export default function App() {
   };
 
   return (
-    <div className="App">
+    <div className="SleepTracker">
       <h1>睡眠管理アプリ</h1>
       <form onSubmit={handleSubmit}>
         <div>
