@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const API_BASE_URL = 'http://172.16.15.35:8000';
 
 function User() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [currentUsername, setCurrentUsername] = useState('');
   
-  const history = useNavigate();
+  const navigate = useNavigate();
+
+  const getCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_BASE_URL}/users/me/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setCurrentUsername(response.data.username);
+    } catch (error) {
+      console.error('Error getting current user:', error);
+    }
+  };
 
   const register = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/users/', {
+      await axios.post(`${API_BASE_URL}/users/`, {
         username: username,
         password: password
       }, {
@@ -22,7 +37,7 @@ function User() {
         }
       });
       alert("新規登録が完了しました");
-      //history('/login'); // ログインページにリダイレクト
+      //navigate('/login'); // ログインページにリダイレクト
     } catch (error) {
       if (error.response) {
         console.error('Error response:', error.response.data);
@@ -35,7 +50,7 @@ function User() {
   const login = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/token', {
+      const response = await axios.post(`${API_BASE_URL}/token`, {
         username: loginUsername,
         password: loginPassword
       }, {
@@ -44,7 +59,8 @@ function User() {
         }
       });
       localStorage.setItem('token', response.data.access_token); // トークンをローカルストレージに保存
-      history('/sleeptracker'); // sleeptrackerページにリダイレクト
+      await getCurrentUser();
+      navigate('/sleeptracker'); // sleeptrackerページにリダイレクト
     } catch (error) {
       console.error('There was an error logging in!', error);
     }
@@ -82,6 +98,12 @@ function User() {
             <button type="submit">Login</button>
           </form>
         </div>
+        {currentUsername && (
+          <div>
+            <h2>Current User</h2>
+            <p>Username: {currentUsername}</p>
+          </div>
+        )}
       </div>
     </div>
   );

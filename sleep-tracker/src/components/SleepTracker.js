@@ -1,6 +1,5 @@
-
 import React, { useRef, useEffect, useState } from "react";
-// import axios from "axios";
+import axios from "axios";
 import {
   Chart as ChartJS,
   LinearScale,
@@ -16,6 +15,7 @@ import {
   TimeScale
 } from "chart.js";
 import "chart.js/auto";
+import { Chart } from "react-chartjs-2";
 
 ChartJS.register(
   LinearScale,
@@ -31,6 +31,8 @@ ChartJS.register(
   TimeScale
 );
 
+const API_BASE_URL = 'http://172.16.15.35:8000';
+
 const labels = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"];
 
 const initialData = {
@@ -42,7 +44,7 @@ const initialData = {
       backgroundColor: "rgb(255, 99, 132)",
       borderColor: "white",
       borderWidth: 2,
-      data: [0, 0, 0, 0, 0, 0, 0],
+      data: [9, 10, 8, 9, 0, 0, 0],
       yAxisID: "y" // Y軸の設定
     },
     // {
@@ -95,58 +97,58 @@ export const options = {
   }
 };
 
-export default function SleepTracker() {
+export default function App() {
   const [bedtime, setBedtime] = useState("");
   const [wakeup, setWakeup] = useState("");
-  //const [sleepData, setSleepData] = useState([]);
+  const [sleepData, setSleepData] = useState([]);
+
+  const [currentUsername, setCurrentUsername] = useState('');
+  const [currentUserid, setCurrentUserid] = useState('');
 
   const chartRef = useRef(null); // chartの参照を取得するため必要
 
   useEffect(() => {
-    const ctx = null
-    document.addEventListener("DOMContentLoaded", (event) => {
-      ctx = document.getElementById("chart").getContext("2d");
-    });
-    chartRef.current = new ChartJS(ctx, {
-      type: 'bar',
-      data: initialData,
-      options: options
-    });
-    return () => {
-      chartRef.current.destroy();
-    };
+    //fetchSleepData();
+    getCurrentUser();
   }, []);
 
-  // const fetchSleepData = async () => {
-  //   const response = await axios.get("http://localhost:8000/sleep-data/");
-  //   setSleepData(response.data);
-  // };
+  const getCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_BASE_URL}/users/me/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setCurrentUsername(response.data.username);
+      setCurrentUserid(response.data.id);
+      console.log(response.data.id);
+    } catch (error) {
+      console.error('Error getting current user:', error);
+    }
+  };
 
-  const handleSubmit = async (event) => {
+  const fetchSleepData = async () => {
+    const response = await axios.get(`${API_BASE_URL}/sleep-data/`);
+    setSleepData(response.data);
+  };
+
+  const handleSubmit = (event) => {
     event.preventDefault();
-    // const today = new Date().toISOString().split("T")[0];
-    const previous_day = new Date();
-    previous_day.setDate(previous_day.getDate() - 1);
-
-    console.log(bedtime)
-
     const bedtimes = new Date(bedtime).getTime();
     const wakeups = new Date(wakeup).getTime();
-    let dayofweek = new Date(bedtime).getDay() - 1;
-    console.log(dayofweek)
-    var diff = wakeups - bedtimes;
+    const dayofweek = new Date(bedtime).getDay() - 1;
 
-    // ref.currentでchartの参照にアクセスできる
-    //chartRef.current.data.datasets[0].data[dayofweek] = bedtime;
-    //chartRef.current.data.datasets[1].data[dayofweek] = wakeup;
+    const diff = wakeups - bedtimes;
     chartRef.current.data.datasets[0].data[dayofweek] = Math.abs(diff) / (60 * 60 * 1000);
 
     chartRef.current.update(); // update()を呼ぶと再レンダリングする
   };
 
   return (
-    <div className="SleepTracker">
+    <div className="App">
       <h1>睡眠管理アプリ</h1>
+      <ul>
+        {currentUsername}
+      </ul>
       <form onSubmit={handleSubmit}>
         <div>
           <label>就寝時間 : </label>
@@ -164,9 +166,9 @@ export default function SleepTracker() {
             onChange={(e) => setWakeup(e.target.value)}
           />
         </div>
-        <button type="submit" id="btn">Submit</button>
+        <button type="submit">Submit</button>
       </form>
-      <canvas id="chart" />
+      <Chart ref={chartRef} type={"bar"} data={initialData} options={options} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ pip install -r requirements.txt
 
 ・サーバー起動
 uvicorn api.main:app --reload
+uvicorn api.main:app --host 172.16.15.35 
 
 ・pythonモジュールの追加
 pip install ~
@@ -55,3 +56,5 @@ https://qiita.com/rgbkids/items/8ec309d1bf5e203d2b19
 https://shopify-restaurant.com/github-desctop-how-to/
 ・Windows、macOS、LinuxにReactをインストールする方法
 https://kinsta.com/jp/knowledgebase/install-react/#windowsreact
+・
+https://zenn.dev/saito2321/articles/85cfe362749f37
