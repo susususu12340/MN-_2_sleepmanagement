@@ -7,9 +7,8 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/user" element={User()} />
         <Route path="/sleeptracker" element={SleepTracker()} />
-        <Route path="/" element={<Navigate to="/user" />}></Route>
+        <Route path="/" element={<Navigate to="/sleeptracker" />}></Route>
       </Routes>
     </div>
   );
