@@ -31,7 +31,8 @@ ChartJS.register(
   TimeScale
 );
 
-const API_BASE_URL = 'http://172.16.15.35:8000';
+//const API_BASE_URL = 'http://172.16.15.35:8000';
+const API_BASE_URL = 'http://localhost:8000';
 
 const labels = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"];
 
@@ -134,11 +135,16 @@ export default function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const bedtimes = new Date(bedtime).getTime();
+    console.log(bedtime)
+    console.log(bedtimes)
     const wakeups = new Date(wakeup).getTime();
+    console.log(wakeup)
+    console.log(wakeups)
     const dayofweek = new Date(bedtime).getDay() - 1;
 
     const diff = wakeups - bedtimes;
-    chartRef.current.data.datasets[0].data[dayofweek] = Math.abs(diff) / (60 * 60 * 1000);
+    const sleeptime = Math.abs(diff) / (60 * 60 * 1000)
+    chartRef.current.data.datasets[0].data[dayofweek] = sleeptime;
 
     chartRef.current.update(); // update()を呼ぶと再レンダリングする
   };

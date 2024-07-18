@@ -1,12 +1,36 @@
+from datetime import datetime, timedelta, timezone
+from typing import Union
+
+import jwt
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
+from passlib.context import CryptContext
 from pydantic import BaseModel, Field
-from datetime import datetime
+from sqlalchemy import create_engine, Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session, Mapped, relationship
+from api.database import SessionLocal, engine, Base
+
+# データベースURLの設定
+DATABASE_URL = "sqlite:///./test.db"
+
+# データベースモデルの定義
+class SleepDataInDB(Base):
+    __tablename__ = "SleepDatas"
+    id = Column(Integer, primary_key=True)
+    parent_id = Column(Integer)
+    date = Column(String) #2024-07-12
+    bedtime = Column(String) #2024-07-12T22:03
+    wakeup = Column(String) #2024-07-12T22:03
+    sleeptime = Column(Integer) #9
 
 class SleepData(BaseModel):
-    # user: str | None = Field("0", description="ユーザID")
+    user_id: int | None = Field(None, description="ユーザID")
     date: str | None = Field(None, description="睡眠日時(就寝日)")
     bedtime: str | None = Field(None, description="就寝時間")
     wakeup: str | None = Field(None, description="起床時間")
-    sleeptime: str | None = Field(None, description="睡眠時間")
+    sleeptime: int | None = Field(None, description="睡眠時間")
 
 # class System(BaseModel):
 #     current_id: int = Field(0, descript="Current (latest) ID")

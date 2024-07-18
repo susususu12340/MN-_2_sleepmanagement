@@ -1,16 +1,12 @@
-from datetime import datetime, timedelta, timezone
 from typing import Union
 
-import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, String, Integer, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker, Session, Mapped, relationship
+
 from api.database import SessionLocal, engine, Base
+from api.schemas.sleepdata import *
 
 # 秘密鍵とアルゴリズムの設定
 SECRET_KEY = "51925bf53f48364c15db67c85e470a91270415775d0a0dda032d41173cad6ff4"
@@ -34,6 +30,7 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
+    id: int
     username: Union[str, None] = None
 
 class User(BaseModel):
