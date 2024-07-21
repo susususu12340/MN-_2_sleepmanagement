@@ -3,8 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
 from api.routers import group
+from api.routers import chat
 from api.routers import sleepdata
 from api.routers import userdata
+
+import api.schemas.group
+import api.schemas.chat
+import api.schemas.userdata 
+import api.schemas.sleepdata
+import api.association
+
+from api.database import *
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -20,3 +31,5 @@ app.add_middleware(
 # app.include_router(group.router)
 app.include_router(sleepdata.router)
 app.include_router(userdata.router)
+app.include_router(group.router)
+app.include_router(chat.router)

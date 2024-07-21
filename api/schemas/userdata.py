@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, String, Integer, Boolean
@@ -6,7 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, Mapped, relationship
 
 from api.database import SessionLocal, engine, Base
+from api.association import association_table
 from api.schemas.sleepdata import *
+from api.schemas.group import *
 
 # 秘密鍵とアルゴリズムの設定
 SECRET_KEY = "51925bf53f48364c15db67c85e470a91270415775d0a0dda032d41173cad6ff4"
