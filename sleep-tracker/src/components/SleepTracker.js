@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -15,7 +16,6 @@ import {
   TimeScale
 } from "chart.js";
 import "chart.js/auto";
-import { Chart } from "react-chartjs-2";
 
 ChartJS.register(
   LinearScale,
@@ -30,9 +30,6 @@ ChartJS.register(
   Title,
   TimeScale
 );
-
-//const API_BASE_URL = 'http://172.16.15.35:8000';
-const API_BASE_URL = 'http://localhost:8000';
 
 const labels = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"];
 
@@ -103,48 +100,46 @@ export default function App() {
   const [wakeup, setWakeup] = useState("");
   const [sleepData, setSleepData] = useState([]);
 
-  const [currentUsername, setCurrentUsername] = useState('');
-  const [currentUserid, setCurrentUserid] = useState('');
-
   const chartRef = useRef(null); // chartの参照を取得するため必要
 
   useEffect(() => {
-    //fetchSleepData();
-    getCurrentUser();
+    const ctx = document.getElementById("chart").getContext("2d");
+    chartRef.current = new ChartJS(ctx, {
+      type: 'bar',
+      data: initialData,
+      options: options
+    });
+    return () => {
+      chartRef.current.destroy();
+    };
   }, []);
 
-  const getCurrentUser = async () => {
-    const token = localStorage.getItem('token');
-    try {
-      const response = await axios.get(`${API_BASE_URL}/users/me/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      setCurrentUsername(response.data.username);
-      setCurrentUserid(response.data.id);
-      console.log(response.data.id);
-    } catch (error) {
-      console.error('Error getting current user:', error);
-    }
-  };
-
   const fetchSleepData = async () => {
-    const response = await axios.get(`${API_BASE_URL}/sleep-data/`);
+    const response = await axios.get("http://localhost:8000/sleep-data/");
     setSleepData(response.data);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const bedtimes = new Date(bedtime).getTime();
-    console.log(bedtime)
-    console.log(bedtimes)
-    const wakeups = new Date(wakeup).getTime();
-    console.log(wakeup)
-    console.log(wakeups)
-    const dayofweek = new Date(bedtime).getDay() - 1;
+    const today = new Date().toISOString().split("T")[0];
+    const previous_day = new Date();
+    previous_day.setDate(previous_day.getDate() - 1);
 
-    const diff = wakeups - bedtimes;
-    const sleeptime = Math.abs(diff) / (60 * 60 * 1000)
-    chartRef.current.data.datasets[0].data[dayofweek] = sleeptime;
+    console.log(bedtime)
+
+    const bedtimes = new Date(bedtime).getTime();
+    const wakeups = new Date(wakeup).getTime();
+    let dayofweek = new Date(bedtime).getDay() - 1;
+    if (dayofweek == -1){
+      dayofweek == 6
+    }
+    console.log(dayofweek)
+    var diff = wakeups - bedtimes;
+
+    // ref.currentでchartの参照にアクセスできる
+    //chartRef.current.data.datasets[0].data[dayofweek] = bedtime;
+    //chartRef.current.data.datasets[1].data[dayofweek] = wakeup;
+    chartRef.current.data.datasets[0].data[dayofweek] = Math.abs(diff) / (60 * 60 * 1000);
 
     chartRef.current.update(); // update()を呼ぶと再レンダリングする
   };
@@ -152,9 +147,6 @@ export default function App() {
   return (
     <div className="App">
       <h1>睡眠管理アプリ</h1>
-      <ul>
-        {currentUsername}
-      </ul>
       <form onSubmit={handleSubmit}>
         <div>
           <label>就寝時間 : </label>
@@ -172,9 +164,9 @@ export default function App() {
             onChange={(e) => setWakeup(e.target.value)}
           />
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" id="btn">Submit</button>
       </form>
-      <Chart ref={chartRef} type={"bar"} data={initialData} options={options} />
+      <canvas id="chart" />
     </div>
   );
 }
