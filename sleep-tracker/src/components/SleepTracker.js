@@ -140,12 +140,10 @@ export default function App() {
     const wakeups = new Date(wakeup).getTime();
     let dayofweek = new Date(bedtime).getDay() - 1;
     if (dayofweek == -1){
-      dayofweek == 6
+      dayofweek = 6
     }
     console.log(dayofweek)
-    var diff = wakeups - bedtimes;
-
-    const diff = wakeups - bedtimes;
+    let diff = wakeups - bedtimes;
     const sleeptime = Math.abs(diff) / (60 * 60 * 1000)
     chartRef.current.data.datasets[0].data[dayofweek] = sleeptime;
 
