@@ -138,9 +138,12 @@ export default function App() {
     console.log(bedtime)
     console.log(bedtimes)
     const wakeups = new Date(wakeup).getTime();
-    console.log(wakeup)
-    console.log(wakeups)
-    const dayofweek = new Date(bedtime).getDay() - 1;
+    let dayofweek = new Date(bedtime).getDay() - 1;
+    if (dayofweek == -1){
+      dayofweek == 6
+    }
+    console.log(dayofweek)
+    var diff = wakeups - bedtimes;
 
     const diff = wakeups - bedtimes;
     const sleeptime = Math.abs(diff) / (60 * 60 * 1000)
