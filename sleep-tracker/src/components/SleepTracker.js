@@ -130,6 +130,9 @@ export default function App() {
     const bedtimes = new Date(bedtime).getTime();
     const wakeups = new Date(wakeup).getTime();
     let dayofweek = new Date(bedtime).getDay() - 1;
+    if (dayofweek == -1){
+      dayofweek == 6
+    }
     console.log(dayofweek)
     var diff = wakeups - bedtimes;
 
