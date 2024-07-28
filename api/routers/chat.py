@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Request, HTTPException, WebSocket, WebSo
 from pydantic import ValidationError, BaseModel
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import create_engine, Column, String, Integer, and_
+import json
 
 from api.schemas.chat import *
 from api.database import SessionLocal, engine, Base
@@ -51,7 +52,13 @@ async def create_chat(chat: ChatBase, db: Session = Depends(get_db)):
     db.add(db_chat)
     db.commit()
     db.refresh(db_chat)
-    await manager.broadcast(f"New message in group {chat.group_id}: {chat.message}")
+    message_data = {
+        "group_id": chat.group_id,
+        "user_id": chat.user_id,
+        "user_name": chat.user_name,
+        "message": chat.message
+    }
+    await manager.broadcast(json.dumps(message_data))
     return db_chat
 
 @router.get("/chats/{group_id}", response_model=List[ChatData])

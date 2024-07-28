@@ -11,7 +11,7 @@ function User() {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
-  
+
   const navigate = useNavigate();
 
   const getCurrentUser = async () => {
