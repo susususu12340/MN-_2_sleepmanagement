@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Container, TextField, Button, Typography, Box, Paper, Grid } from '@mui/material';
 
-//const API_BASE_URL = 'http://172.16.15.35:8000';
 const API_BASE_URL = 'http://localhost:8000';
 
 function User() {
@@ -38,7 +38,6 @@ function User() {
         }
       });
       alert("新規登録が完了しました");
-      //navigate('/login'); // ログインページにリダイレクト
     } catch (error) {
       if (error.response) {
         console.error('Error response:', error.response.data);
@@ -59,55 +58,98 @@ function User() {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
-      localStorage.setItem('token', response.data.access_token); // トークンをローカルストレージに保存
+      localStorage.setItem('token', response.data.access_token);
       await getCurrentUser();
-      navigate('/sleeptracker'); // sleeptrackerページにリダイレクト
+      navigate('/sleeptracker');
     } catch (error) {
       console.error('There was an error logging in!', error);
     }
   };
 
   return (
-    <div className="App">
-      <h1>睡眠管理アプリ</h1>
-      <div>
-        <div>
-          <h2>Register</h2>
-          <form onSubmit={register}>
-            <div>
-              <label>Username:</label>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            </div>
-            <div>
-              <label>Password:</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-            <button type="submit">Register</button>
-          </form>
-        </div>
-        <div>
-          <h2>Login</h2>
-          <form onSubmit={login}>
-            <div>
-              <label>Username:</label>
-              <input type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required />
-            </div>
-            <div>
-              <label>Password:</label>
-              <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
-            </div>
-            <button type="submit">Login</button>
-          </form>
-        </div>
-        {currentUsername && (
-          <div>
-            <h2>Current User</h2>
-            <p>Username: {currentUsername}</p>
-          </div>
-        )}
-      </div>
-    </div>
+    <Container maxWidth="sm">
+      <Typography variant="h3" align="center" gutterBottom>
+        睡眠管理アプリ
+      </Typography>
+      <Paper elevation={3} sx={{ padding: 3 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h5" align="center" gutterBottom>
+              Register
+            </Typography>
+            <form onSubmit={register}>
+              <TextField
+                label="Username"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <TextField
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Box textAlign="center" marginTop={2}>
+                <Button type="submit" variant="contained" color="primary">
+                  Register
+                </Button>
+              </Box>
+            </form>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h5" align="center" gutterBottom>
+              Login
+            </Typography>
+            <form onSubmit={login}>
+              <TextField
+                label="Username"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={loginUsername}
+                onChange={(e) => setLoginUsername(e.target.value)}
+                required
+              />
+              <TextField
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                required
+              />
+              <Box textAlign="center" marginTop={2}>
+                <Button type="submit" variant="contained" color="primary">
+                  Login
+                </Button>
+              </Box>
+            </form>
+          </Grid>
+          {currentUsername && (
+            <Grid item xs={12}>
+              <Typography variant="h5" align="center" gutterBottom>
+                Current User
+              </Typography>
+              <Typography variant="body1" align="center">
+                Username: {currentUsername}
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+      </Paper>
+    </Container>
   );
 }
 
 export default User;
+

@@ -16,6 +16,7 @@ import {
 } from "chart.js";
 import "chart.js/auto";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Container, TextField, Button, Typography, Box, Paper, Grid } from '@mui/material';
 
 ChartJS.register(
   LinearScale,
@@ -102,6 +103,7 @@ export default function SleepTracker() {
       });
       setCurrentUsername(response.data.username);
       setCurrentUserid(response.data.id);
+
       console.log('Username set:', response.data.username);
       console.log('User ID set:', response.data.id);
       return response.data.id;  // ユーザーIDを返す
@@ -161,6 +163,12 @@ export default function SleepTracker() {
       dayofweek = 6;
     }
     const diff = Math.abs(wakeups - bedtimes) / (60 * 60 * 1000);
+
+    console.log(currentUserid)
+    console.log(input_date)
+    console.log(new Date(bedtime).toISOString())
+    console.log(new Date(wakeup).toISOString())
+    console.log(diff)
 
     try {
       const token = localStorage.getItem('token');
@@ -224,56 +232,125 @@ export default function SleepTracker() {
   };
 
   return (
-    <div className="App">
-      <h1>睡眠管理アプリ</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>就寝時間 : </label>
-          <input
-            type="datetime-local"
-            value={bedtime}
-            onChange={(e) => setBedtime(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>起床時間 : </label>
-          <input
-            type="datetime-local"
-            value={wakeup}
-            onChange={(e) => setWakeup(e.target.value)}
-          />
-        </div>
-        <button type="submit" id="btn">Submit</button>
-      </form>
-      <canvas id="chart" ref={canvasRef} />
-      <div>
-        <h2>Register</h2>
+    <Container maxWidth="md">
+      <Typography variant="h3" align="center" gutterBottom>
+        睡眠管理アプリ
+      </Typography>
+      <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          睡眠データの入力
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="就寝時間"
+                type="datetime-local"
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={bedtime}
+                onChange={(e) => setBedtime(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="起床時間"
+                type="datetime-local"
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={wakeup}
+                onChange={(e) => setWakeup(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Box textAlign="center" marginTop={2}>
+                <Button type="submit" variant="contained" color="primary">
+                  Submit
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
+      <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
+        <canvas id="chart" ref={canvasRef} />
+      </Paper>
+      <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          グループの新規登録
+        </Typography>
         <form onSubmit={register_group}>
-          <div>
-            <label>Username:</label>
-            <input type="text" value={groupname} onChange={(e) => setGroupname(e.target.value)} required />
-          </div>
-          <div>
-            <label>Password:</label>
-            <input type="password" value={grouppassword} onChange={(e) => setGroupPassword(e.target.value)} required />
-          </div>
-          <button type="submit">Register</button>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="グループ名"
+                fullWidth
+                value={groupname}
+                onChange={(e) => setGroupname(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="パスワード"
+                type="password"
+                fullWidth
+                value={grouppassword}
+                onChange={(e) => setGroupPassword(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Box textAlign="center" marginTop={2}>
+                <Button type="submit" variant="contained" color="primary">
+                  Register
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
         </form>
-      </div>
-      <div>
-        <h2>Login</h2>
+      </Paper>
+      <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          グループにログイン
+        </Typography>
         <form onSubmit={login}>
-          <div>
-            <label>Username:</label>
-            <input type="text" value={logingroupname} onChange={(e) => setLogingroupname(e.target.value)} required />
-          </div>
-          <div>
-            <label>Password:</label>
-            <input type="password" value={logingroupPassword} onChange={(e) => setLogingroupPassword(e.target.value)} required />
-          </div>
-          <button type="submit">Login</button>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="グループ名"
+                fullWidth
+                value={logingroupname}
+                onChange={(e) => setLogingroupname(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="パスワード"
+                type="password"
+                fullWidth
+                value={logingroupPassword}
+                onChange={(e) => setLogingroupPassword(e.target.value)}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Box textAlign="center" marginTop={2}>
+                <Button type="submit" variant="contained" color="primary">
+                  Login
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
         </form>
-      </div>
-    </div>
+      </Paper>
+    </Container>
   );
 }

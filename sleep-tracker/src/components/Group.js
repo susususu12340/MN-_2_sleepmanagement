@@ -16,6 +16,7 @@ import {
 } from "chart.js";
 import "chart.js/auto";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Container, TextField, Button, Typography, Box, Paper, Grid, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 ChartJS.register(
   LinearScale,
@@ -85,25 +86,53 @@ const ChatInput = ({ onSendMessage }) => {
   };
 
   return (
-    <div>
-      <input
-        type="text"
+    <Box display="flex" mt={2}>
+      <TextField
+        fullWidth
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="メッセージを入力してください"
+        variant="outlined"
       />
-      <button onClick={handleSend}>送信</button>
-    </div>
+      <Button variant="contained" color="primary" onClick={handleSend} sx={{ ml: 2 }}>
+        送信
+      </Button>
+    </Box>
   );
 };
 
-const ChatDisplay = ({ messages }) => {
+const ChatDisplay = ({ messages, currentUserid }) => {
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
-    <div>
+    <Box mt={2} p={2} border={1} borderColor="grey.400" borderRadius={2} height={300} overflow="auto">
       {messages.map((msg, index) => (
-        <div key={index}>{msg.user_name}: {msg.message}</div>
+        <Box
+          key={index}
+          display="flex"
+          justifyContent={msg.user_id === currentUserid ? "flex-end" : "flex-start"}
+          mb={1}
+        >
+          <Box
+            px={2}
+            py={1}
+            borderRadius={16}
+            bgcolor={msg.user_id === currentUserid ? "primary.main" : "grey.300"}
+            color={msg.user_id === currentUserid ? "white" : "black"}
+            maxWidth="70%"
+          >
+            <Typography variant="body2">
+              {msg.user_name}: {msg.message}
+            </Typography>
+          </Box>
+        </Box>
       ))}
-    </div>
+      <div ref={chatEndRef} />
+    </Box>
   );
 };
 
@@ -123,8 +152,12 @@ export default function App() {
   const [groupUsers, setGroupUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedUserSleepData, setSelectedUserSleepData] = useState([]);
+  const [comparisonUser, setComparisonUser] = useState('');
+  const [comparisonUserSleepData, setComparisonUserSleepData] = useState([]);
   const chartRef = useRef(null);
+  const comparisonChartRef = useRef(null);
   const canvasRef = useRef(null);
+  const comparisonCanvasRef = useRef(null);
 
   const getCurrentUser = async () => {
     const token = localStorage.getItem('token');
@@ -186,6 +219,15 @@ export default function App() {
         });
       }
 
+      if (comparisonCanvasRef.current) {
+        const ctx = comparisonCanvasRef.current.getContext("2d");
+        comparisonChartRef.current = new ChartJS(ctx, {
+          type: 'bar',
+          data: initialData,
+          options: options
+        });
+      }
+
       fetchChatData(Group_id);
       fetchGroupUsers(Group_id);
 
@@ -199,12 +241,15 @@ export default function App() {
         if (chartRef.current) {
           chartRef.current.destroy();
         }
+        if (comparisonChartRef.current) {
+          comparisonChartRef.current.destroy();
+        }
         ws.close();
       };
     }
   }, [location.pathname]);
 
-  const fetchSleepData = async (userId) => {
+  const fetchSleepData = async (userId, chart = chartRef) => {
     const token = localStorage.getItem('token');
     try {
       const response = await axios.get(`${API_BASE_URL}/sleep-data/week`, {
@@ -212,19 +257,28 @@ export default function App() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const sleepTimes = response.data.map(entry => entry.sleeptime || 0);
-      setSleepData(sleepTimes);
-      chartRef.current.data.datasets[0].data = sleepTimes;
-      chartRef.current.update();
+      if (chart === chartRef) {
+        setSleepData(sleepTimes);
+      } else {
+        setComparisonUserSleepData(sleepTimes);
+      }
+      chart.current.data.datasets[0].data = sleepTimes;
+      chart.current.update();
     } catch (error) {
       console.error('Error fetching sleep data:', error);
     }
   };
 
-
   const handleUserChange = (event) => {
     const userId = event.target.value;
     setSelectedUser(userId);
-    fetchSleepData(userId);
+    fetchSleepData(userId, chartRef);
+  };
+
+  const handleComparisonUserChange = (event) => {
+    const userId = event.target.value;
+    setComparisonUser(userId);
+    fetchSleepData(userId, comparisonChartRef);
   };
 
   const handleSubmit = async (event) => {
@@ -279,48 +333,73 @@ export default function App() {
   };
 
   return (
-    <div className="App">
-      <h1>睡眠管理アプリ</h1>
-      <div>
+    <Container>
+      <Typography variant="h3" align="center" gutterBottom>
+        睡眠管理アプリ
+      </Typography>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         {groupname && (
-          <div>
-            <h2>グループ名</h2>
-            <p>グループ: {groupname}</p>
-          </div>
+          <Box mb={2}>
+            <Typography variant="h6">グループ名</Typography>
+            <Typography variant="body1">グループ: {groupname}</Typography>
+          </Box>
         )}
-      </div>
-      <canvas id="chart" ref={canvasRef} />
-      <h2>抜ける</h2>
-      <form onSubmit={Back}>
-        <button type="submit">抜ける</button>
-      </form>
-      <div>
-        <h2>Chat</h2>
-        <ChatDisplay messages={messages} />
-        <ChatInput onSendMessage={handleSendMessage} />
-      </div>
-      <div>
-        <h2>グループメンバーの睡眠データ</h2>
-        <select onChange={handleUserChange}>
-          <option value="">ユーザーを選択してください</option>
-          {groupUsers.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.username}
-            </option>
-          ))}
-        </select>
-        {selectedUser && (
-          <div>
-            <h3>ユーザー: {groupUsers.find(user => user.id === selectedUser)?.username}</h3>
-            {selectedUserSleepData.map((data, index) => (
-              <div key={index}>
-                <p>日付: {data.date}</p>
-                <p>睡眠時間: {data.sleeptime} 時間</p>
-              </div>
+        <FormControl fullWidth>
+          <InputLabel id="select-user-label">ユーザーを選択してください</InputLabel>
+          <Select
+            labelId="select-user-label"
+            value={selectedUser}
+            onChange={handleUserChange}
+            label="ユーザーを選択してください"
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {groupUsers.map((user) => (
+              <MenuItem key={user.id} value={user.id}>
+                {user.username}
+              </MenuItem>
             ))}
-          </div>
-        )}
-      </div>
-    </div>
+          </Select>
+        </FormControl>
+        <canvas id="chart" ref={canvasRef} />
+      </Paper>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+        <FormControl fullWidth>
+          <InputLabel id="select-comparison-user-label">比較するユーザーを選択してください</InputLabel>
+          <Select
+            labelId="select-comparison-user-label"
+            value={comparisonUser}
+            onChange={handleComparisonUserChange}
+            label="比較するユーザーを選択してください"
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {groupUsers.map((user) => (
+              <MenuItem key={user.id} value={user.id}>
+                {user.username}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <canvas id="comparison-chart" ref={comparisonCanvasRef} />
+      </Paper>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          Chat
+        </Typography>
+        <ChatDisplay messages={messages} currentUserid={currentUserid} />
+        <ChatInput onSendMessage={handleSendMessage} />
+      </Paper>
+      <Box textAlign="center" mt={3}>
+        <form onSubmit={Back}>
+          <Button type="submit" variant="contained" color="secondary">
+            抜ける
+          </Button>
+        </form>
+      </Box>
+    </Container>
   );
 }
+
