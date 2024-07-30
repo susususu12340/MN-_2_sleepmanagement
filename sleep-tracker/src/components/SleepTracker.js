@@ -32,7 +32,8 @@ ChartJS.register(
   TimeScale
 );
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://172.16.15.35:8000';
+//const API_BASE_URL = 'http://localhost:8000';
 const URL_PATH = "/sleeptracker";
 
 const labels = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"];
@@ -81,7 +82,7 @@ export default function SleepTracker() {
 
   const [bedtime, setBedtime] = useState("");
   const [wakeup, setWakeup] = useState("");
-  const [sleepData, setSleepData] = useState(initialData.datasets[0].data);
+  //const [sleepData, setSleepData] = useState(initialData.datasets[0].data);
 
   const [groupname, setGroupname] = useState('');
   const [grouppassword, setGroupPassword] = useState('');
@@ -121,7 +122,7 @@ export default function SleepTracker() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const sleepTimes = response.data.map(entry => entry.sleeptime || 0);
-      setSleepData(sleepTimes);
+      //setSleepData(sleepTimes);
       chartRef.current.data.datasets[0].data = sleepTimes;
       chartRef.current.update();
     } catch (error) {
@@ -152,13 +153,13 @@ export default function SleepTracker() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const input_date = new Date(bedtime).toISOString().split("T")[0];
+    const input_date = new Date().toISOString().split("T")[0];
     const previous_day = new Date();
     previous_day.setDate(previous_day.getDate() - 1);
 
     const bedtimes = new Date(bedtime).getTime();
     const wakeups = new Date(wakeup).getTime();
-    let dayofweek = new Date(bedtime).getDay() - 1;
+    let dayofweek = new Date(input_date).getDay() - 1;
     if (dayofweek === -1) {
       dayofweek = 6;
     }

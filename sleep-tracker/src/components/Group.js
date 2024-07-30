@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import "chart.js/auto";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, TextField, Button, Typography, Box, Paper, Grid, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Paper, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 ChartJS.register(
   LinearScale,
@@ -32,7 +32,9 @@ ChartJS.register(
   TimeScale
 );
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://172.16.15.35:8000';
+const WS_BASE_URL = '172.16.15.35:8000';
+//const API_BASE_URL = 'http://localhost:8000';
 const URL_PATH = "/Group";
 
 const labels = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"];
@@ -140,20 +142,13 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [bedtime, setBedtime] = useState("");
-  const [wakeup, setWakeup] = useState("");
-  const [sleepData, setSleepData] = useState([]);
-  const [groupname, setGroupname] = useState('');
-  const [grouppassword, setGroupPassword] = useState('');
-  const [currentgroupid, setCurrenGroupId] = useState('');
+  const [groupname] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
   const [currentUserid, setCurrentUserid] = useState('');
   const [messages, setMessages] = useState([]);
   const [groupUsers, setGroupUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
-  const [selectedUserSleepData, setSelectedUserSleepData] = useState([]);
   const [comparisonUser, setComparisonUser] = useState('');
-  const [comparisonUserSleepData, setComparisonUserSleepData] = useState([]);
   const chartRef = useRef(null);
   const comparisonChartRef = useRef(null);
   const canvasRef = useRef(null);
@@ -169,7 +164,7 @@ export default function App() {
       setCurrentUserid(response.data.id);
       console.log('Username set:', response.data.username);
       console.log('User ID set:', response.data.id);
-      return response.data.id;  // ユーザーIDを返す
+      return response.data.id;
     } catch (error) {
       console.error('Error getting current user:', error);
       return null;
@@ -231,12 +226,6 @@ export default function App() {
       fetchChatData(Group_id);
       fetchGroupUsers(Group_id);
 
-      const ws = new WebSocket(`ws://localhost:8000/ws/${Group_id}`);
-      ws.onmessage = (event) => {
-        const newMessage = JSON.parse(event.data);
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      };
-
       return () => {
         if (chartRef.current) {
           chartRef.current.destroy();
@@ -244,10 +233,23 @@ export default function App() {
         if (comparisonChartRef.current) {
           comparisonChartRef.current.destroy();
         }
-        ws.close();
       };
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    const Group_id = localStorage.getItem('group_id');
+
+    const ws = new WebSocket(`ws://${WS_BASE_URL}/ws/${Group_id}`);
+    ws.onmessage = (event) => {
+      const newMessage = JSON.parse(event.data);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   const fetchSleepData = async (userId, chart = chartRef) => {
     const token = localStorage.getItem('token');
@@ -258,9 +260,9 @@ export default function App() {
       });
       const sleepTimes = response.data.map(entry => entry.sleeptime || 0);
       if (chart === chartRef) {
-        setSleepData(sleepTimes);
+        //setSleepData(sleepTimes);
       } else {
-        setComparisonUserSleepData(sleepTimes);
+        //setComparisonUserSleepData(sleepTimes);
       }
       chart.current.data.datasets[0].data = sleepTimes;
       chart.current.update();
@@ -279,28 +281,6 @@ export default function App() {
     const userId = event.target.value;
     setComparisonUser(userId);
     fetchSleepData(userId, comparisonChartRef);
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const today = new Date().toISOString().split("T")[0];
-    const previous_day = new Date();
-    previous_day.setDate(previous_day.getDate() - 1);
-
-    console.log(bedtime);
-
-    const bedtimes = new Date(bedtime).getTime();
-    const wakeups = new Date(wakeup).getTime();
-    let dayofweek = new Date(bedtime).getDay() - 1;
-    if (dayofweek === -1) {
-      dayofweek = 6;
-    }
-    console.log(dayofweek);
-    var diff = wakeups - bedtimes;
-
-    chartRef.current.data.datasets[0].data[dayofweek] = Math.abs(diff) / (60 * 60 * 1000);
-
-    chartRef.current.update();
   };
 
   const Back = async (e) => {
@@ -402,4 +382,3 @@ export default function App() {
     </Container>
   );
 }
-
